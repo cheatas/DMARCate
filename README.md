@@ -34,9 +34,11 @@ Make shure you place the database user credentials in the following files:
 * heatMap-out.py
 
 
-Tool 1
+Phase 1 
 ============
 
+This phase is meant ot give the domain owner an overview of the possible sources
+that can deliver DMARC reports.
 
 Phase 1 consist of two files:
 
@@ -56,8 +58,13 @@ After running `html-output.py` a HTML called `dm-phase1.html` is created.
 
 
 
-Tool 2
+Phase 2
 ===========
+
+This phase is meant the monitor the domain during deployment/operationn. 
+It provides various tools which include: current DMARC status, DMARC tester, authentication 
+results and DNS history tool. 
+
 
 Phase 2 consist of the following files with their corresponding output:
 
