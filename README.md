@@ -61,7 +61,7 @@ After running `html-output.py` a HTML called `dm-phase1.html` is created.
 Phase 2
 ===========
 
-This phase is meant the monitor the domain during deployment/operationn. 
+This phase is meant to monitor the domain during deployment/operationn. 
 It provides various tools which include: current DMARC status, DMARC tester, authentication 
 results and DNS history tool. 
 
@@ -74,6 +74,7 @@ Phase 2 consist of the following files with their corresponding output:
 * `counters.py` -> `counterTrust.html`, `counterForeign.html`
 * `graph.py` -> `graphTrust.js`, `graphForeign.js`
 * `dns-record-tracker.py`
+* `dm-ph2.html`
 
 `domain-status.py` checks the presence of several important DMARC parameters and warns the user if any are not configured. Additionally the current DMARC record is displayed.
 
@@ -97,6 +98,9 @@ Additionally, a set of counters shows the aggregate authentication results. Thes
 `dns-record-tracker.py` tracks the SPF, DKIM and DMARC records of a domain. Any record change is saved
 in the MySQL database. These records are used by `graph.py` to generate the DNS history time line.
 It advised to run this script frequently when one is changing on of the 3 records frequently (for example during the deployment)
+
+The individual generatad files for each widget are combined into one web interface in `dm-ph2.html`. 
+
 
 Visualizations
 =============
