@@ -71,8 +71,7 @@ def parse(input_csv):
 			</style> -->
 
 
-			<h1><p class="text-center">DMARC deployer</p></h1>
-			<h4><p class="text-center">Phase 1</p></h4>
+			<h1><p class="text-center">DMARC Pre-check</p></h1>
 			<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 			<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 			<!-- Include all compiled plugins (below), or include individual files as needed -->
