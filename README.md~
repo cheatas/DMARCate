@@ -85,7 +85,7 @@ is used by `email-test.py`
 
 `counters.py` generates statistics about authentication results. The results are dived into
 two sections: Trusted and Unknown sources. Each section contains an IP list that displays
-the IP addresses that fall within this category and the number of messages that they have sent.
+the IP addresses that fall whitin this category and the number of messages that they have sent.
 Additionally, a set of counters shows the aggregate authentication results. These include SPF, DKIM and DMARC results. The script must be supplied with a list of trusted sources like:
 
     python counter.py 192.0.0.1
