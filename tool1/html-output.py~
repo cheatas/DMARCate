@@ -44,7 +44,7 @@ def parse(input_csv):
 			print row
 			domain_list.append(row)
 			totalCount += int(row[1])
-			if row[2] != "None":
+			if row[3] != "None":
 				dmarcPubCount += 1
 		domainCount = len(domain_list)
 		dmarcNoPubCount = domainCount - dmarcPubCount
@@ -150,7 +150,7 @@ def parse(input_csv):
 		output.write("""<tr>
 				<td>""" + str(domain[0]) + """</td>
 				<td>""" + str(domain[1]) + """</td>
-				<td>""" + str(domain[2]) + """</td>
+				<td>""" + str(domain[3]) + """</td>
 			      </tr>""")
 	
 	
