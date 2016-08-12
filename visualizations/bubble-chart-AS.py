@@ -45,7 +45,7 @@ dbUserName = "dmarc"
 dbPassword = "dmarcrp2"
 asnDatabase = 'asn-mapping.dat'
 
-ASNvolume = {}
+ASvolume = {}
 asndb = pyasn.pyasn(asnDatabase)
 
 lookup = False
@@ -121,7 +121,7 @@ for x in queryResult:
 		ASnumber = asndb.lookup(str(netaddr.IPAddress(ipv6String)))[0]
 
 	try:
-		volume = ASNvolume[ASnumber]
+		volume = ASvolume[ASnumber]
 		dmarcPassCount = volume[0]
 		volumeCount = volume[1]
 	
@@ -131,24 +131,24 @@ for x in queryResult:
 		else:
 			volumeCount += count
 
-		ASNvolume[ASnumber] = (dmarcPassCount, volumeCount)
+		ASvolume[ASnumber] = (dmarcPassCount, volumeCount)
 
 	except:
 		#Apperently we are the first to insert something for this IP block
 		if dkimResult == "pass" or spfResult == "pass":
-			ASNvolume[ASnumber] = (count, count)
+			ASvolume[ASnumber] = (count, count)
 		else:
-			ASNvolume[ASnumber] = (0, count)
+			ASvolume[ASnumber] = (0, count)
 		
 
 
 #Calculate the ratio of each IP chunk
-for key, value in ASNvolume.iteritems():
+for key, value in ASvolume.iteritems():
 	dmarcPass = value[0]
 	totalCount = value[1]
 
 	ratio = dmarcPass / totalCount
-	ASNvolume[key] = (dmarcPass, totalCount , ratio)
+	ASvolume[key] = (dmarcPass, totalCount , ratio)
 
 fig, ax = plt.subplots()
 xAxis = []
@@ -162,7 +162,7 @@ chunkVolume = None
 
 
 #Comment in this section for creating real bubble chart
-'''for key, value in ASNvolume.iteritems():
+'''for key, value in ASvolume.iteritems():
 
 	ASnumber = key
 	chunkVolume = value[1]
@@ -174,20 +174,24 @@ chunkVolume = None
 
 	xAxis.append(int(ASnumber))
 	yAxis.append(chunkRatio)
-	ax.annotate(str(ASnumber), (xAxis[-1]+(chunkVolume/600), yAxis[-1]), size=20)'''
+	if(total < 10000):
+		ax.annotate(str(ASnumber), (xAxis[-1]+(chunkVolume/3), yAxis[-1]), size=20)
+	else:
+		ax.annotate(str(ASnumber), (xAxis[-1]+(chunkVolume/10), yAxis[-1]), size=20)
+	'''
 
 #For demo purposes only. Comment out and comment in for loop above if
 #you want to generate the bubble chart for a real domain
 #############Demo start
-for x in range (0,8):
+for x in range (0,4):
 
 	ASNrandom = random.randrange(0, 30000)
 
 	while ASNrandom in ip:
-		ASNrandom = random.randrange(0, 3)
+		ASNrandom = random.randrange(0, 30000)
 	
 	ip.append(ASNrandom)
-	total = random.randrange(0, 30000)
+	total = random.randrange(0, 1000)
 
 	ratio = random.random()
 	
@@ -196,32 +200,36 @@ for x in range (0,8):
 	xAxis.append(ASNrandom)
 	yAxis.append(ratio)
 
-	ax.annotate(str(ASNrandom), (xAxis[-1]+(total/600), yAxis[-1]+0.1), size=20)
+	
+	if(total < 10000):
+		ax.annotate(str(ASNrandom), (xAxis[-1]+int(total/3), yAxis[-1]), size=20)
+	else:
+		ax.annotate(str(1103), (xAxis[-1]+int(total/10), yAxis[-1]), size=20)
 
 	volume.append(total)
+
 
 #############Demo end
 
 ax.scatter(xAxis, yAxis, s=volume, marker='o', c=ratioList, cmap=plt.cm.RdYlGn, vmin=0, vmax=1)
-ax.set_ylim(bottom=0)
-ax.set_xlim(left=0, right=max(xAxis)+1000)
-ax.set_xlabel('ASN')
+ax.set_ylim(bottom=-0.1)
+ax.set_xlim(left=0, right=max(xAxis)+5000)
+ax.set_xlabel('AS Number')
 ax.set_ylabel('Ratio')
 
 plt.show()
 
-print ASNvolume
 
 #Generate asn list which holds volume and ratio per AS
 if lookup:
-	for	asn, value in ASNvolume.iteritems():
+	for	asn, value in ASvolume.iteritems():
 		output.write("----- " + str(asn) + " -----\n")
 		output.write("Name: \t\t" + getASNdata(asn) + "\n")
 		output.write("Ratio: \t\t" + str(value[2]) + "\n")
 		output.write("Volume: \t" + str(value[1]) + "\n")
 		output.write("\n\n")
 else:
-	for	asn, value in ASNvolume.iteritems():
+	for	asn, value in ASvolume.iteritems():
 		output.write("----- " + str(asn) + " -----\n")
 		output.write("Ratio: \t\t" + str(value[2]) + "\n")
 		output.write("Volume: \t" + str(value[1]) + "\n")
@@ -229,18 +237,5 @@ else:
 
 output.close()
 	
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
