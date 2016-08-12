@@ -22,6 +22,9 @@ Requirements
  * Matplotlib
  * numpy
  * python Tkinter
+ * pyasn
+ * urllib
+ * json
 * MySQL database
 
 Make sure you place the database user credentials in the following files:
@@ -106,13 +109,16 @@ Visualizations
 
 The visualizations consist of the following files:
 
-* bubble-chart.py
+* bubble-chart-ASN.py
 * heatMap-in.py
 * heatMap-out.py
+* bubble-chart.py
 
-`bubble-chart.py` generates a bubble chart to review where emails come from, in which quantities and the ratio of successful DMARC authentication results. These three variables are displayed in a bubble chart. 
+
+`bubble-chart-ASN.py` generates a bubble chart to review where emails come from, in which quantities and the ratio of successful DMARC authentication results. The categorization is based on ASN numbers obtained using `pyasn`. This libary requires a BGP/MRT dump file as input. These dumps can be found at http://archive.routeviews.org/. The ASN <-> IP mapping for IPv4 and IPv6 is found in seppreate files which are not autmatically merged by `pyasn`. An mergeged file of this mapping can be found under `asn-mapping.dat` (version of 12-08-15). Additionally, a text file with the results of each AS is generated. This file is named `asn-mapping.dat`. The user can optionally call this script with the `--asn-lookup` argument which will lookup the corrosponding (orginizational) name of the AS. 
 
 `heatMap-in.py` generates a heat map that displays the authentication results of different domains based on incoming reports. Each tile is awarded a color based on the ratio of successful authentication results against the total amount of emails. Each tile contains text fields that indicate the total number of emails, volume of emails that passed DMARC and volume of email that failed DMARC.
 
 `heatMap-out.py` has the same functionality as `heatMap-in.py` but than for outgoing reports. Based on OpenDmarc's import functionality.
 
+`bubble-chart.py` generates a bubble chart to review where emails come from, in which quantities and the ratio of successful DMARC authentication results. These three variables are displayed in a bubble chart. 
