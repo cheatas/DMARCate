@@ -115,5 +115,5 @@ The visualizations consist of two files:
 
 `heatMap-in.py` generates a heat map that displays the authentication results of different domains. Each tile is awarded a color based on the ratio of successful authentication results against the total amount of emails. Each tile contains text fields that indicate the total number of emails, volume of emails that passed DMARC and volume of email that failed DMARC.
 
-`heatMap-out.py` same functionality as `heatMap-in.py` but than for outgoing reports. Based on OpenDmarc's import functionality.
+`heatMap-out.py` has the same functionality as `heatMap-in.py` but than for outgoing reports. Based on OpenDmarc's import functionality.
 
