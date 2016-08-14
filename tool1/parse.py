@@ -42,15 +42,15 @@ def init():
 def parse(input_file, domain):
 
 	tokens = input_file.readlines();
-	pattern = re.compile(r'@.*?>,')
+	pattern = re.compile(r'@.*?>')
 	domains = []
 
 
 	#Read mail log line by line
 	for token in tokens:
+		token = token.lower()
 		fields = token.split(" ")
 		result = re.findall(pattern, token)
-
 		#We dont want emails that are sent to the domain, only outgoing emails.
 		#Ugly but works for now. We need a propper domain selection tool	
 		if result and ("@" + domain +">," not in result):
@@ -63,11 +63,12 @@ def parse(input_file, domain):
 
 #Function to retrieve a DMARC record	
 def dmarc_lookup(domain):
-	
+	print domain	
+
 	answer=""
 	
 	try:
-		answer = dns.resolver.query("_dmarc." + domain , "TXT")
+		answer = dns.resolver.query("_dmarc." + domain + "." , "TXT")
 		for data in answer:
 			answer = data
 	except:
