@@ -88,13 +88,13 @@ def parse(input_csv):
 			</div>"""
 	domainCountHtml = """<div class="col-md-1" >
 
-  					<h1 class="text-center bg-success"><strong>""" + str(domainCount) + """</strong></h1>
+  					<h1 class="text-center bg-warning"><strong>""" + str(domainCount) + """</strong></h1>
 					<p class="text-center"><strong>Domains</strong></p>
 
 			</div>"""
 	dmarcPubHtml = """<div class="col-md-1">
 
-  					<h1 class="text-center bg-warning"><strong>""" + str(dmarcPubCount) +"""</strong></h1>
+  					<h1 class="text-center bg-success"><strong>""" + str(dmarcPubCount) +"""</strong></h1>
 					<p class="text-center"><strong>DMARC record published</strong></p>
 
 			</div>""" 
@@ -111,7 +111,7 @@ def parse(input_csv):
 		<hr>"""
 	startTableHtml = """<div class="row">
 
-		
+		<p class="text-center"><em>Domains which have published a DMARC record may provide you with reports on you mail systems's operation.</em></p>
 			<div class="container"> 
 			  <table class="table">
 			    <thead>

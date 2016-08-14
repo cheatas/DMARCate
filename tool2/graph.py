@@ -135,6 +135,7 @@ def generateGraph(dates, query, dbAddress, dbUserName, dbPassword, dbName):
 				spfResult = entry[23]
 				count = entry[17]
 
+				#Configure strictness of DMARC check here.
 				if ((dkimResult == 'pass') or (spfResult == 'pass')):
 					dmarcCompliant += count
 				else:

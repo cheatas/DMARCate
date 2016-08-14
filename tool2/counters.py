@@ -136,6 +136,7 @@ def retrieveData(db, fileHandleTrusted, fileHanldeForeign, domains):
 			else:
 				spfFail	+= count
 
+			#Configure strictness of DMARC check here.
 			if ((dkimResult == 'pass') or (spfResult == 'pass')):
 					dmarcCompliant += count
 			else:
