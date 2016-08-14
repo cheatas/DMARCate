@@ -10,6 +10,12 @@
 #   (including headers) is sent to the server   #
 #   over a secure channel 		                #
 #												#
+#   SSL connection based on:                    #
+#                                               #
+#   https://carlo-hamalainen.net/blog           #
+#   /2013/1/24/python-ssl-socket-echo-          #
+#   test-with-self-signed-certificate           #
+#	                                			#
 # To be set by user:							#
 #												#				
 #	mailbox variable	                        #

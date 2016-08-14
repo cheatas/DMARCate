@@ -10,7 +10,13 @@
 #   by client is checked on SPF and DKIM        #
 #   allignment. The result is written to an 	#
 #	HTML file									#
-#												#
+#								                #
+#   SSL connection based on:                    #
+#                                               #
+#   https://carlo-hamalainen.net/blog           #
+#   /2013/1/24/python-ssl-socket-echo-          #
+#   test-with-self-signed-certificate           #
+#	                                			#
 # To be set by user:							#
 #												#				
 #	key variable    	                        #
@@ -154,8 +160,8 @@ def writeMailTofile(data):
         sys.exit()
 
 
-def do_something(connstream, data):
-    print "do_something:", data
+def read_data(connstream, data):
+    print "read_data:", data
     
     if data[-1] == "\n" and data[-2] == "\n":
         return False
@@ -165,7 +171,7 @@ def deal_with_client(connstream):
     data = connstream.recv(8192)
     while data:
         print "in loop"
-        if not do_something(connstream, data):
+        if not read_data(connstream, data):
             break
         data = connstream.recv(8192)
     return data
