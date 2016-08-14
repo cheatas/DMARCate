@@ -1,7 +1,7 @@
 Description
 ======
 
-A DMARC deployment/monitoring tool written in python. 
+A DMARC deployment/monitoring tool written in python.
 
 Requirements
 =======
@@ -17,6 +17,7 @@ Requirements
  * pydkim 3
  * pyspf 2.0.12
  * python email
+ * ssl
 * Techsneeze's dmarc parser. Can be found at: https://github.com/techsneeze/dmarcts-report-parser/blob/master/dmarcts-report-parser.pl
 * For Visualizations:
  * Matplotlib
@@ -38,7 +39,7 @@ Make sure you place the database user credentials in the following files:
 * heatMap-out.py
 
 
-Tool 1 
+Tool 1
 ============
 
 This tool is meant to give the domain owner an overview of the possible sources
@@ -56,24 +57,25 @@ Use `parse.py` to generate a CSV file that is accepted by `html-output.py`.
 
 This will create a CSV file called `output.csv` which must be supplied to `html-output.py`:
 
-    python html-output output.CSV
+    python html-output.py output.CSV
 
-After running `html-output.py` a HTML called `dm-phase1.html` is created that holds the result.
+After running `html-output.py`, a HTML file called `dm-phase1.html` is created that holds the result.
 
 
 
-Tool 2 
+Tool 2
 ===========
 
-This tool is meant to monitor the domain during the deployment/operation of DMARC. 
-It provides various tools which include: current DMARC status, DMARC tester, authentication 
-results and a DNS history tool. 
+This tool is meant to monitor the domain during the deployment/operation of DMARC.
+It provides various tools which include: current DMARC status, DMARC tester, authentication
+results and a DNS history tool.
 
 Phase 2 consist of the following files with their corresponding output:
 
 * `domain-status.py` -> `domainstatus.html`
-* `email-test.py` -> `dmarcCheck.html`
-* `senTestMail.py`
+* `dmarc-EmailTest-client.py`
+* `dmarc-EmailTest-server.py` -> `dmarcCheck.html`
+* `sendTestMail.py`
 * `counters.py` -> `counterTrust.html`, `counterForeign.html`
 * `graph.py` -> `graphTrust.js`, `graphForeign.js`
 * `dns-record-tracker.py`
@@ -81,10 +83,15 @@ Phase 2 consist of the following files with their corresponding output:
 
 `domain-status.py` checks the presence of several important DMARC parameters and warns the user if any of these are not configured. Additionally the current DMARC record is displayed.
 
-`email-test.py` is a script script automatically reads the contents of a reserved mailbox after which it checks if the email is SPF and DKIM aligned.
+`dmarc-EmailTest-client.py` is the client application that should have access to a remote mailbox. It polls the mailbox for any new message. If a message is found, it sends the message including the headers to the server over a secure channel. `dmarc-EmailTest-server.py` implements the server. The server listens for a client connection. If the client sends a message, its evaluated on SPF and DKIM allignment. The results are written to `dmarcCheck.html`. For the secure connection, the user needs to create a certificate and a key. OpenSSL can do this:
+
+
+    openssl genrsa 2048 > key
+    openssl req -new -x509 -nodes -sha1 -days 365 -key key > cert
+
 
 `sendTestMail.py` can automatically send an test mail to the reserved mailbox that
-is used by `email-test.py`
+is used by `dmarc-EmailTest-client.py`
 
 `counters.py` generates statistics about authentication results. The results are dived into
 two sections: Trusted and Unknown sources. Each section contains an IP list that displays
@@ -101,7 +108,7 @@ Additionally, a set of counters shows the aggregate authentication results. Thes
 in the MySQL database. These records are used by `graph.py` to generate the DNS history time line.
 It advised to run this script frequently when one is changing one of the 3 records (SPF, DKIM, DMARC) frequently (for example during the deployment).
 
-The individual generated files for each widget are combined into one web interface in `dm-ph2.html`. 
+The individual generated files for each widget are combined into one web interface in `dm-ph2.html`.
 
 
 Visualizations
@@ -115,10 +122,10 @@ The visualizations consist of the following files:
 * bubble-chart.py
 
 
-`bubble-chart-ASN.py` generates a bubble chart to review where emails come from, in which quantities and the ratio of successful DMARC authentication results. The categorization is based on ASN numbers obtained using `pyasn`. This libary requires a BGP/MRT dump file as input. These dumps can be found at http://archive.routeviews.org/. The ASN <-> IP mapping for IPv4 and IPv6 is found in seppreate files which are not autmatically merged by `pyasn`. An mergeged file of this mapping can be found under `asn-mapping.dat` (version of 12-08-15). Additionally, a text file with the results of each AS is generated. This file is named `asn-mapping.dat`. The user can optionally call this script with the `--asn-lookup` argument which will lookup the corrosponding (orginizational) name of the AS. 
+`bubble-chart-ASN.py` generates a bubble chart to review where emails come from, in which quantities and the ratio of successful DMARC authentication results. The categorization is based on ASN numbers obtained using `pyasn`. This libary requires a BGP/MRT dump file as input. These dumps can be found at http://archive.routeviews.org/. The ASN <-> IP mapping for IPv4 and IPv6 is found in seppreate files which are not autmatically merged by `pyasn`. An mergeged file of this mapping can be found under `asn-mapping.dat` (version of 12-08-15). Additionally, a text file with the results of each AS is generated. This file is named `asn-mapping.dat`. The user can optionally call this script with the `--asn-lookup` argument which will lookup the corrosponding (orginizational) name of the AS.
 
 `heatMap-in.py` generates a heat map that displays the authentication results of different domains based on incoming reports. Each tile is awarded a color based on the ratio of successful authentication results against the total amount of emails. Each tile contains text fields that indicate the total number of emails, volume of emails that passed DMARC and volume of email that failed DMARC.
 
 `heatMap-out.py` has the same functionality as `heatMap-in.py` but than for outgoing reports. Based on OpenDmarc's import functionality.
 
-`bubble-chart.py` generates a bubble chart to review where emails come from, in which quantities and the ratio of successful DMARC authentication results. These three variables are displayed in a bubble chart. 
+`bubble-chart.py` generates a bubble chart to review where emails come from, in which quantities and the ratio of successful DMARC authentication results. These three variables are displayed in a bubble chart.
