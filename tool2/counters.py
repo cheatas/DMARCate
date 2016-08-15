@@ -33,6 +33,17 @@ dbUserName = "dmarc"
 dbPassword = "dmarcrp2"
 
 
+def calculateRatio(x1, x2):
+
+	result = ""
+
+	try:
+		result = str(round((float(x1)/x2) * 100))
+	except:
+		result = "0"
+
+	return result
+
 
 #Function that connects to the SQL database. 
 def connectToDB(dbAddress, dbUserName, dbPassword, dbName):
@@ -52,11 +63,19 @@ def openFile():
 	argumentLen = len(sys.argv)
 	fileHandle = None
 
-	if argumentLen > 1:
+	trusted_list = open("trusted-list.txt", 'r')
+
+
+	#Collect all trusted sources given by the the trusted list
+	for line in trusted_list:
+		domains.append(line[0:-1])
+
+
+	if len(domains) > 0:
 
 		#Collect all trusted sources given by the argument list
-		for x in range(1, argumentLen):
-			domains.append(sys.argv[x])
+		#for x in range(1, argumentLen):
+		#	domains.append(sys.argv[x])
 
 		#Prepare output files
 		try:
@@ -159,6 +178,11 @@ def retrieveData(db, fileHandleTrusted, fileHanldeForeign, domains):
 
 		print ipBoxString
 
+
+
+
+
+
 		result = """
 	
 	<div class="col-md-2" >
@@ -178,13 +202,13 @@ def retrieveData(db, fileHandleTrusted, fileHanldeForeign, domains):
 		<table style="width:100%">
 		  <tr>
 			<td>
-				<h1 class="text-center bg-success"><strong>""" + str(dkimPass) + """</strong></h1><div class="text-center bg-success"><strong>""" + str(round((float(dkimPass)/totalCount) * 100)) + """ %</strong></div>
+				<h1 class="text-center bg-success"><strong>""" + str(dkimPass) + """</strong></h1><div class="text-center bg-success"><strong>""" + calculateRatio(dkimPass, totalCount) + """ %</strong></div>
 				<p class="text-center"><strong>DKIM pass</strong></p>
 			</td>
 		  </tr>
 		  <tr>
 			<td>
-				<h1 class="text-center bg-danger"><strong>""" + str(dkimFail) + """</strong></h1><div class="text-center bg-danger"><strong>""" + str(round((float(dkimFail)/totalCount) * 100)) + """ %</strong></div>
+				<h1 class="text-center bg-danger"><strong>""" + str(dkimFail) + """</strong></h1><div class="text-center bg-danger"><strong>""" + calculateRatio(dkimFail, totalCount) + """ %</strong></div>
 				<p class="text-center"><strong>DKIM fail</strong></p>
 			</td>
 		  </tr>
@@ -195,13 +219,13 @@ def retrieveData(db, fileHandleTrusted, fileHanldeForeign, domains):
 		<table style="width:100%">
 		  <tr>
 			<td>
-				<h1 class="text-center bg-success"><strong>""" + str(spfPass) + """</strong></h1><div class="text-center bg-success"><strong>""" + str(round((float(spfPass)/totalCount) * 100)) + """ %</strong></div>
+				<h1 class="text-center bg-success"><strong>""" + str(spfPass) + """</strong></h1><div class="text-center bg-success"><strong>""" + calculateRatio(spfPass, totalCount) + """ %</strong></div>
 				<p class="text-center"><strong>SPF pass</strong></p>
 			</td>
 		  </tr>
 		  <tr>
 			<td>
-				<h1 class="text-center bg-danger"><strong>""" + str(spfFail) + """</strong></h1><div class="text-center bg-danger"><strong>""" + str(round((float(spfFail)/totalCount) * 100)) + """ %</strong></div>
+				<h1 class="text-center bg-danger"><strong>""" + str(spfFail) + """</strong></h1><div class="text-center bg-danger"><strong>""" + calculateRatio(spfFail, totalCount) + """ %</strong></div>
 				<p class="text-center"><strong>SPF fail</strong></p>
 			</td>
 		  </tr>
@@ -218,7 +242,7 @@ def retrieveData(db, fileHandleTrusted, fileHanldeForeign, domains):
 		  </tr>
 		  <tr>
 			<td>
-				<h1 class="text-center bg-warning"><strong>""" + str(dmarcCompliant) + """</strong></h1><div class="text-center bg-warning"><strong>""" + str(round((float(dmarcCompliant)/totalCount) * 100)) + """ %</strong></div>
+				<h1 class="text-center bg-warning"><strong>""" + str(dmarcCompliant) + """</strong></h1><div class="text-center bg-warning"><strong>""" + calculateRatio(dmarcCompliant, totalCount) + """ %</strong></div>
 				<p class="text-center"><strong>DMARC compliant</strong></p>
 			
 			</td>

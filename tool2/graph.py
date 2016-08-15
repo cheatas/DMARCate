@@ -61,10 +61,19 @@ def openFile():
 	argumentLen = len(sys.argv)
 	fileHandle = None
 
-	if argumentLen > 1:
+	trusted_list = open("trusted-list.txt", 'r')
 
-		for x in range(1, argumentLen):
-			domains.append(sys.argv[x])
+
+	#Collect all trusted sources given by the the trusted list
+	for line in trusted_list:
+		domains.append(line[0:-1])
+
+
+	if len(domains) > 0:
+
+		#Collect all trusted sources given by the argument list
+		#for x in range(1, argumentLen):
+		#	domains.append(sys.argv[x])
 
 		try:
 			fileHandleTrusted = open('graphTrust.js', 'w')
