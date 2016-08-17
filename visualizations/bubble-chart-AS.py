@@ -46,6 +46,7 @@ dbPassword = "dmarcrp2"
 asnDatabase = 'asn-mapping.dat'
 
 ASvolume = {}
+ASipMapping = {}
 asndb = pyasn.pyasn(asnDatabase)
 
 lookup = False
@@ -73,7 +74,29 @@ def convertIPv6(ipv6):
 			
 	return ipv6String[:-1]
 
+#Store IP addresses found from each AS and their authentication result. 
+def insertIP(AS ,ipv4, ipv6, dkimResult, spfResult):
 
+	insertString = None
+
+	if ipv6 == None:
+		insertString = ipv4
+	else:
+		insertString = ipv6
+
+	if dkimResult is not "pass" and spfResult is not "pass":
+		ASipMapping[AS].append("F  " + insertString)
+
+	else:
+		ASipMapping[AS].append("P  " + insertString)
+		
+#Write IP address authentication results to a file. 
+def writeIP(filehandle, array):
+
+	for address in array:
+		filehandle.write(address + "\n")
+
+		
 #Get name linked to the AS
 def getASNdata(asn):
 	url = "http://rdap.arin.net/bootstrap/autnum/" + str(asn)
@@ -100,10 +123,11 @@ cursor = db.cursor()
 cursor.execute("select * from report inner join rptrecord on report.serial=rptrecord.serial")
 queryResult = cursor.fetchall()
 
-
+#Comment in this for loop for creating real bubble chart
 #Parse result and count total volume and successful authentication results. 
 for x in queryResult:
 	ip = x[15]
+	ipString = None
 	ipv6 = x[16]
 	ipv6String = None
 	dkimResult = x[21]
@@ -113,7 +137,8 @@ for x in queryResult:
 	
 	#Check if the address is IPv4 or IPv6 and retrieve the ASN
 	if ipv6 == None:
-		ASnumber = asndb.lookup(str(netaddr.IPAddress(ip)))[0]
+		ipString = str(netaddr.IPAddress(ip))
+		ASnumber = asndb.lookup(ipString)[0]
 	else:
 		#The binary blob from the MySQL database needs to be converted to a 
 		#IPv6 string first.
@@ -122,6 +147,11 @@ for x in queryResult:
 
 	try:
 		volume = ASvolume[ASnumber]
+		ASipList = ASvolume[ASnumber][3]
+
+		print ASipList
+
+
 		dmarcPassCount = volume[0]
 		volumeCount = volume[1]
 	
@@ -131,17 +161,24 @@ for x in queryResult:
 		else:
 			volumeCount += count
 
+
 		ASvolume[ASnumber] = (dmarcPassCount, volumeCount)
+
+		insertIP(ASnumber, ip, ipv6, dkimResult, spfResult)
 
 	except:
 		#Apperently we are the first to insert something for this IP block
 		if dkimResult == "pass" or spfResult == "pass":
-			ASvolume[ASnumber] = (count, count)
+			ASvolume[ASnumber] = (count, count,[])
 		else:
-			ASvolume[ASnumber] = (0, count)
+			ASvolume[ASnumber] = (0, count, [])
+
+		ASipMapping[ASnumber] = []
+
+		insertIP(ASnumber, ipString, ipv6String, dkimResult, spfResult)
 		
 
-
+#Comment in this for loop for creating real bubble chart
 #Calculate the ratio of each IP chunk
 for key, value in ASvolume.iteritems():
 	dmarcPass = value[0]
@@ -149,6 +186,9 @@ for key, value in ASvolume.iteritems():
 
 	ratio = dmarcPass / totalCount
 	ASvolume[key] = (dmarcPass, totalCount , ratio)
+
+
+
 
 fig, ax = plt.subplots()
 xAxis = []
@@ -162,7 +202,7 @@ chunkVolume = None
 
 
 #Comment in this section for creating real bubble chart
-'''for key, value in ASvolume.iteritems():
+for key, value in ASvolume.iteritems():
 
 	ASnumber = key
 	chunkVolume = value[1]
@@ -174,16 +214,16 @@ chunkVolume = None
 
 	xAxis.append(int(ASnumber))
 	yAxis.append(chunkRatio)
-	if(total < 10000):
+	if(chunkVolume < 10000):
 		ax.annotate(str(ASnumber), (xAxis[-1]+(chunkVolume/3), yAxis[-1]), size=20)
 	else:
 		ax.annotate(str(ASnumber), (xAxis[-1]+(chunkVolume/10), yAxis[-1]), size=20)
-	'''
+
 
 #For demo purposes only. Comment out and comment in for loop above if
 #you want to generate the bubble chart for a real domain
 #############Demo start
-for x in range (0,4):
+'''or x in range (0,4):
 
 	ASNrandom = random.randrange(0, 30000)
 
@@ -193,6 +233,14 @@ for x in range (0,4):
 	ip.append(ASNrandom)
 	total = random.randrange(0, 1000)
 
+
+	ASipMapping[ASNrandom] = []
+
+
+	for x in range(0, total):
+		ASipMapping[ASNrandom].append("demo address")
+
+
 	ratio = random.random()
 	
 	ratioList.append(ratio)
@@ -201,6 +249,8 @@ for x in range (0,4):
 	yAxis.append(ratio)
 
 	
+	ASvolume[ASNrandom] = (0, total , ratio)
+
 	if(total < 10000):
 		ax.annotate(str(ASNrandom), (xAxis[-1]+int(total/3), yAxis[-1]), size=20)
 	else:
@@ -208,7 +258,7 @@ for x in range (0,4):
 
 	volume.append(total)
 
-
+'''
 #############Demo end
 
 ax.scatter(xAxis, yAxis, s=volume, marker='o', c=ratioList, cmap=plt.cm.RdYlGn, vmin=0, vmax=1)
@@ -227,12 +277,14 @@ if lookup:
 		output.write("Name: \t\t" + getASNdata(asn) + "\n")
 		output.write("Ratio: \t\t" + str(value[2]) + "\n")
 		output.write("Volume: \t" + str(value[1]) + "\n")
+		writeIP(output, ASipMapping[asn])
 		output.write("\n\n")
 else:
 	for	asn, value in ASvolume.iteritems():
 		output.write("----- " + str(asn) + " -----\n")
 		output.write("Ratio: \t\t" + str(value[2]) + "\n")
 		output.write("Volume: \t" + str(value[1]) + "\n")
+		writeIP(output, ASipMapping[asn])
 		output.write("\n\n")
 
 output.close()
