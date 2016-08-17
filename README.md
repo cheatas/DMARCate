@@ -38,7 +38,7 @@ Make sure you place the database user credentials in the following files:
 * heatMap-in.py
 * heatMap-out.py
 
-For use of `dns-record-tracker`, insert the following table into the datbase named `dmarc` which is created by the dmarc parser from Techsneeze:
+For use of `dns-record-tracker.py`, insert the following table into the datbase named `dmarc` which is created by the dmarc parser from Techsneeze:
 
 | Column name  | Type   |
 |---|---|
